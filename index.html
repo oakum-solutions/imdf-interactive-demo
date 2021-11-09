@@ -1,0 +1,285 @@
+</<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leaflet Test</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="leaflet_1.7.1\leaflet.css"
+       integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+       crossorigin=""/>
+
+     <script src="leaflet_1.7.1\leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+  </head>
+  <body bgcolor='grey'>
+    <h1 style="color:white;">Leaflet Test: Coit Tower</h1>
+    <div id="map" style="width:auto; height:90%;" align="left"></div>
+
+    <script src="features.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      var TOKEN = "pk.eyJ1Ijoib2FrdW0tcHYiLCJhIjoiY2t2aWZzYXY3MnNmeTJvczE5ZWM5ZHk2aiJ9.GepuOu4YuhSEufBRCekylA";
+      var venue = L.geoJSON(venue, {
+                  		style: {
+                        "color": "#34495e",
+                        "weight": 1,
+                        "opacity": 1,
+                        "fillColor": "#afbcbc",
+                        "fillOpacity": 1
+                      }});
+
+      function unitColor(c) {
+          return c == "column"           ? "#c5cecf" :
+                 c == "elevator"         ? "#bf95d0" :
+                 c == "kitchen"          ? "#c5cecf" :
+                 c == "nonpublic"        ? "#c5cecf" :
+                 c == "ramp"             ? "#ecf0f1" :
+                 c == "restroom"         ? "#c5cecf" :
+                 c == "restroom.female"  ? "white" :
+                 c == "restroom.male"    ? "white" :
+                 c == "room"             ? "#67b2e4" :
+                 c == "stairs"           ? "#87decd" :
+                 c == "storage"          ? "#c5cecf" :
+                 c == "structure"        ? "#c5cecf" :
+                 c == "unenclosedarea"   ? "#ecf0f1" :
+                 c == "walkway"          ? "#ecf0f1" :
+                                           "red"   ; // if no category
+      };
+
+      function unitStyle(feature) {
+          return {
+            //  lines
+            color: "#bdc3c7",
+            weight: 1,
+            opacity: 1,
+            // Polygons
+            fillColor: unitColor(feature.properties.category),
+            fillOpacity: 1
+          };
+      };
+
+      function createUnitLayer(ordinal) {
+        return L.geoJSON(unit, {
+          style: unitStyle,
+          onEachFeature: onEachFeature,
+          filter: function(feature) {
+            if (feature.properties.level_ordinal == ordinal)
+              return true;
+          }
+        });
+      };
+
+      var unit0 = createUnitLayer(0);
+      var unit1 = createUnitLayer(1);
+      var unit2 = createUnitLayer(2);
+      var unit3 = createUnitLayer(10);
+
+      var defaultIcon = L.icon({
+        iconUrl: "marker-icon.png",
+        iconAnchor: [12.5, 41]
+      });
+
+      var restroomIcon = L.icon({
+        iconUrl: "Amenity_toilets.png",
+        iconSize: [20, 20]
+      });
+
+      var stairsIcon = L.icon({
+        iconUrl: "Amenity_stairs.png",
+        iconSize: [20, 20]
+      });
+
+      var elevatorIcon = L.icon({
+        iconUrl: "Amenity_elevator.png",
+        iconSize: [20, 20]
+      });
+
+      var rampIcon = L.icon({
+        iconUrl: "Amenity_entrance.png",
+        iconSize: [20, 20]
+      });
+
+      var informationIcon = L.icon({
+        iconUrl: "Amenity_gift.png",
+        iconSize: [20, 20]
+      });
+
+      function amenityIcon(feature) {
+        var c = feature.properties.category;
+        switch(c) {
+          case "restroom" : return restroomIcon; break;
+          case "restroom.male" : return restroomIcon; break;
+          case "restroom.female" : return restroomIcon; break;
+          case "stairs" : return stairsIcon; break;
+          case "elevator" : return elevatorIcon; break;
+          case "ramp" : return rampIcon; break;
+          case "information" : return informationIcon; break;
+          default: return defaultIcon;
+          }
+        };
+
+      function createAmenityLayer(ordinal) {
+        return L.geoJSON(amenity, {
+          filter: function(feature) {
+            if (feature.properties.level_ordinal == ordinal)
+              return true;
+          },
+          pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {icon: amenityIcon(feature)});
+          }
+        });
+      }
+
+      var amenity0 = createAmenityLayer(0);
+      var amenity1 = createAmenityLayer(1);
+      var amenity2 = createAmenityLayer(2);
+      var amenity3 = createAmenityLayer(10);
+
+      infoIcon = L.icon({
+        iconUrl: "info.png",
+        iconSize: [25, 25]
+      })
+
+      muralMarker = L.marker([37.80238, -122.405926], {
+        icon: infoIcon,
+        title: "Click to see WPA mural",
+        riseOnHover: true,
+        riseOffset: 250,
+        interactive: true
+        }
+      );
+
+      muralContent = "<img src='Coit_Mural_Agriculture.jpg'/><br/><br/>Source: <a href='https://commons.wikimedia.org/wiki/File:Coit_Mural_Agriculture.jpg'>Wikimedia Commons</a>"
+
+      muralMarker.bindPopup(muralContent, {maxWidth: "auto"});
+
+      viewMarker = L.marker([37.802430, -122.405848], {
+        icon: infoIcon,
+        title: "Click to see the view",
+        riseOnHover: true,
+        riseOffset: 250,
+        interactive: true
+        }
+      );
+
+      viewContent = "<img src='Lombard_Street_from_Coit_Tower.JPG'/><br/><br/>Source: (<a href='https://creativecommons.org/licenses/by-sa/3.0/deed.en'>cc</a>) user Pi.1415926535 via <a href='https://commons.wikimedia.org/wiki/File:Lombard_Street_from_Coit_Tower,_June_2017.JPG'>Wikimedia Commons</a>"
+
+      viewMarker.bindPopup(viewContent, {maxWidth: "auto"});
+
+      var level0 = L.layerGroup([unit0, amenity0, muralMarker])
+      var level1 = L.layerGroup([unit1, amenity1])
+      var level2 = L.layerGroup([unit2, amenity2])
+      var level3 = L.layerGroup([unit3, amenity3, viewMarker])
+
+      var unitLevels = {
+        "Ground": level0,
+        "Mezzanine": level1,
+        "Stairs": level2,
+        "Top Floor": level3
+      };
+
+      var mbAttr = '<a href="https://www.openstreetmap.org/copyright">OSM</a> | <a href ="https://www.mapbox.com/">Mapbox</a>'
+
+      var lightGrey = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
+    		maxZoom: 22,
+    		attribution: mbAttr,
+    		id: 'mapbox/light-v10',
+    		tileSize: 512,
+    		zoomOffset: -1
+    	});
+
+      var darkGrey = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
+        maxZoom: 22,
+        attribution: mbAttr,
+        id: 'mapbox/dark-v10',
+        tileSize: 512,
+        zoomOffset: -1
+      });
+
+      var satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
+        maxZoom: 22,
+        attribution: mbAttr,
+        id: 'mapbox/satellite-v9',
+        tileSize: 512,
+        zoomOffset: -1
+      });
+
+      var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
+        maxZoom: 22,
+        attribution: mbAttr,
+        id: 'mapbox/outdoors-v11',
+        tileSize: 512,
+        zoomOffset: -1
+      });
+
+      var baseMaps = {
+        "Streets": outdoors,
+        "Satellite": satellite,
+        "Light Grey": lightGrey,
+        "Dark Grey": darkGrey
+      };
+
+      // draw map
+      map = L.map('map', {
+        center: [37.8023627,-122.4058271],
+        zoom: 21,
+        layers: [lightGrey, venue, level0]
+      })
+
+      levelControl = L.control.layers(unitLevels, null, {collapsed: false}).addTo(map);
+
+      L.control.layers(baseMaps, null, {collapsed: false, position: "bottomright"}).addTo(map);
+
+      function highlightFeature(e) {
+          layer = e.target;
+
+          layer.setStyle({
+              weight: 6,
+              color: '#93c8ec',
+              opacity: 1,
+              // fillColor: null,
+              // fillOpacity: null
+          });
+
+          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+              layer.bringToFront();
+          }
+      }
+
+      var geojson;
+      function resetHighlight(e) {
+          geojson.resetStyle(e.target);
+      }
+
+      geojson = unit0.addTo(map)
+
+      function zoomToFeature(e) {
+          map.fitBounds(e.target.getBounds());
+      }
+
+      function onEachFeature(feature, layer){
+        // popups
+        var popupContent = "";
+        if (feature.properties && feature.properties.category){
+          popupContent += (feature.properties.category);
+        }
+        if (feature.properties && feature.properties.name) {
+          popupContent += (':<br><b>' + feature.properties.name['en']); // specify language
+        }
+        layer.bindPopup(popupContent);
+
+        // tooltip
+        layer.bindTooltip(popupContent);
+
+        // hover
+        layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight,
+          click: zoomToFeature
+        });
+      }
+    </script>
+  </body>
+</html>
