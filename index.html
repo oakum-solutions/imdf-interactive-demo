@@ -1,20 +1,21 @@
 </<!DOCTYPE html>
 <html>
   <head>
-    <title></title>
+    <title>Leaflet Test</title>
     <meta charset="utf-8">
- 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
-    
- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-   crossorigin=""></script>
+
+    <link rel="stylesheet" href="leaflet_1.7.1\leaflet.css"
+       integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+       crossorigin=""/>
+
+     <script src="leaflet_1.7.1\leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
 
   </head>
   <body bgcolor='grey'>
-    <div id="map" style="width:800px; height:600px;"></div>
+    <h1 style="color:white;">Leaflet Test: Coit Tower</h1>
+    <div id="map" style="width:auto; height:90%;" align="left"></div>
 
     <script src="features.js" type="text/javascript"></script>
 
@@ -81,28 +82,30 @@
       });
 
       var restroomIcon = L.icon({
-        iconUrl: "Amenity_toilets.png",
-        iconSize: [20, 20]
+        iconUrl: "Amenity_restroom.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 18]
       });
 
       var stairsIcon = L.icon({
         iconUrl: "Amenity_stairs.png",
-        iconSize: [20, 20]
+        iconAnchor: [25, 25]
       });
 
       var elevatorIcon = L.icon({
         iconUrl: "Amenity_elevator.png",
-        iconSize: [20, 20]
+        iconAnchor: [25, 25]
       });
 
-      var rampIcon = L.icon({
+      var entranceIcon = L.icon({
         iconUrl: "Amenity_entrance.png",
-        iconSize: [20, 20]
+        iconSize: [40, 40],
+        iconAnchor: [20, 18]
       });
 
-      var informationIcon = L.icon({
+      var giftshopIcon = L.icon({
         iconUrl: "Amenity_gift.png",
-        iconSize: [20, 20]
+        iconAnchor: [25, 25]
       });
 
       function amenityIcon(feature) {
@@ -112,9 +115,11 @@
           case "restroom.male" : return restroomIcon; break;
           case "restroom.female" : return restroomIcon; break;
           case "stairs" : return stairsIcon; break;
+          case "stairs.up" : return stairsIcon; break;
+          case "stairs.down" : return stairsIcon; break;
           case "elevator" : return elevatorIcon; break;
-          case "ramp" : return rampIcon; break;
-          case "information" : return informationIcon; break;
+          case "entrance" : return entranceIcon; break;
+          case "giftshop" : return giftshopIcon; break;
           default: return defaultIcon;
           }
         };
@@ -126,7 +131,10 @@
               return true;
           },
           pointToLayer: function (feature, latlng) {
-            return L.marker(latlng, {icon: amenityIcon(feature)});
+            return L.marker(latlng, {
+              title: feature.properties.category,
+              icon: amenityIcon(feature)
+            });
           }
         });
       }
@@ -137,8 +145,8 @@
       var amenity3 = createAmenityLayer(10);
 
       infoIcon = L.icon({
-        iconUrl: "info.png",
-        iconSize: [25, 25]
+        iconUrl: "Amenity_info.png",
+        iconAnchor: [20.2, 19.5]
       })
 
       muralMarker = L.marker([37.80238, -122.405926], {
@@ -150,7 +158,7 @@
         }
       );
 
-      muralContent = "<img src='Coit_Mural_Agriculture.jpg'/><br/><br/>Source: <a href='https://commons.wikimedia.org/wiki/File:Coit_Mural_Agriculture.jpg'>Wikimedia Commons</a>"
+      muralContent = "<img width='400px' src='Coit_Mural_Agriculture.jpg'/><br/><br/>Source: <a href='https://commons.wikimedia.org/wiki/File:Coit_Mural_Agriculture.jpg'>Wikimedia Commons</a>"
 
       muralMarker.bindPopup(muralContent, {maxWidth: "auto"});
 
@@ -163,7 +171,7 @@
         }
       );
 
-      viewContent = "<img src='Lombard_Street_from_Coit_Tower.JPG'/><br/><br/>Source: (<a href='https://creativecommons.org/licenses/by-sa/3.0/deed.en'>cc</a>) user Pi.1415926535 via <a href='https://commons.wikimedia.org/wiki/File:Lombard_Street_from_Coit_Tower,_June_2017.JPG'>Wikimedia Commons</a>"
+      viewContent = "<img width='400px' src='Lombard_Street_from_Coit_Tower.JPG'/><br/><br/>Source: (<a href='https://creativecommons.org/licenses/by-sa/3.0/deed.en'>cc</a>) user Pi.1415926535 via <a href='https://commons.wikimedia.org/wiki/File:Lombard_Street_from_Coit_Tower,_June_2017.JPG'>Wikimedia Commons</a>"
 
       viewMarker.bindPopup(viewContent, {maxWidth: "auto"});
 
@@ -173,16 +181,16 @@
       var level3 = L.layerGroup([unit3, amenity3, viewMarker])
 
       var unitLevels = {
-        "Ground": level0,
-        "Mezzanine": level1,
-        "Stairs": level2,
-        "Top Floor": level3
+        "4 - Top Floor": level3,
+        "3 - Stairs": level2,
+        "2 - Mezzanine": level1,
+        "1 - Ground": level0
       };
 
       var mbAttr = '<a href="https://www.openstreetmap.org/copyright">OSM</a> | <a href ="https://www.mapbox.com/">Mapbox</a>'
 
       var lightGrey = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
-    		maxZoom: 22,
+    		maxZoom: 23,
     		attribution: mbAttr,
     		id: 'mapbox/light-v10',
     		tileSize: 512,
@@ -190,7 +198,7 @@
     	});
 
       var darkGrey = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
-        maxZoom: 22,
+        maxZoom: 23,
         attribution: mbAttr,
         id: 'mapbox/dark-v10',
         tileSize: 512,
@@ -198,7 +206,7 @@
       });
 
       var satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
-        maxZoom: 22,
+        maxZoom: 23,
         attribution: mbAttr,
         id: 'mapbox/satellite-v9',
         tileSize: 512,
@@ -206,7 +214,7 @@
       });
 
       var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + TOKEN, {
-        maxZoom: 22,
+        maxZoom: 23,
         attribution: mbAttr,
         id: 'mapbox/outdoors-v11',
         tileSize: 512,
